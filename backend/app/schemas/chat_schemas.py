@@ -16,5 +16,8 @@ class ChatResponse(BaseModel):
 
 # --- Workflow State Model (TypedDict) ---
 
+# TODO: Migrate this from TypedDict to a Pydantic BaseModel (v2/v3).
+# Pydantic states provide 5-10x better performance and built-in validation
+# for every node transition, which is the 2026 standard for production agents.
 class GraphState(TypedDict):
     messages: Annotated[list, add_messages]

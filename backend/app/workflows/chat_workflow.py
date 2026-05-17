@@ -23,6 +23,8 @@ def chatbot(state: GraphState):
     It takes the current conversation state, calls the LLM,
     and returns the LLM's response.
     """
+    # TODO: Wrap this invoke in a retry block (e.g., using RunnableRetry) 
+    # to handle rate limits or temporary provider outages.
     # The `state['messages']` contains the entire conversation history.
     response = llm.invoke(state['messages'])
     

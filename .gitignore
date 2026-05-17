@@ -1,2 +1,18 @@
-config.py
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.env
+
+# MacOS
+.DS_Store
+
+# Project Specific
+config.yaml
 /learning
+/backend/tutorial.py
+TUTORIAL.MD
+backend/app/config/config.yaml

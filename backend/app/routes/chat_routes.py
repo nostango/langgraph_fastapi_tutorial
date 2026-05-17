@@ -13,6 +13,12 @@ async def handle_chat_request(request: ChatRequest):
     It invokes the LangGraph workflow with the user's message
     and returns the AI's response.
     """
+    # TODO: Implement a streaming version of this route using `astream_events` 
+    # to provide a "live typing" experience on the frontend.
+    
+    # TODO: Add a try/except block here to catch LLM failures and return 
+    # a graceful SearchResponse/ChatResponse instead of a 500 error.
+    
     # Get the compiled graph from the workflow module
     graph = get_graph()
 

@@ -1,4 +1,2 @@
-.env
 
-# config file with my keys/credentials/llms/etc
-app/config/config.yaml
+.env

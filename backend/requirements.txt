@@ -1,3 +1,5 @@
+# TODO: Pin these versions (e.g., langgraph==0.1.x) or move to a lockfile (uv/poetry) 
+# to ensure the "it worked 10 months ago" problem doesn't break production.
 # Core LangGraph and LangChain dependencies
 langgraph
 langchain
@@ -32,3 +34,6 @@ huggingface_hub
 
 # For local model serving
 uvicorn
+
+# For search tools
+tavily-python

@@ -1,0 +1,1 @@
+# TODO: Implement a skeleton of what tool use could look like: - Be sure to also document the connection and how to basically use the API string or something to have the plug work

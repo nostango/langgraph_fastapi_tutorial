@@ -7,9 +7,10 @@ load_dotenv()
 
 import uvicorn
 from fastapi import FastAPI
-from app.routes import chat_routes, mcp_routes # Import both routers
+from app.routes import chat_routes, mcp_routes, search_routes # Import the new search router
 
 # Create the FastAPI instance, this is how you use and implement FastAPI
+# TODO: Add middleware to capture correlation IDs for LangSmith tracing.
 app = FastAPI(
     title="Template for advanced LLM applications",
     description="This is a template for advanced LLM applications",
@@ -20,11 +21,14 @@ app = FastAPI(
 def read_root():
     return {"message": "Welcome to the LLM App API!"}
 
-# Include the router for our own frontend (the "Lightning port")
+# Include the router for our own frontend
 app.include_router(chat_routes.router, prefix="/chat", tags=["chat"])
 
-# Include the router for external clients (the "USB-C port")
+# Include the router for external clients
 app.include_router(mcp_routes.router, prefix="/mcp", tags=["mcp"])
+
+# Include the new search router
+app.include_router(search_routes.router, prefix="/search", tags=["search"])
 
 
 if __name__ == "__main__":
