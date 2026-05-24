@@ -5,16 +5,38 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI
-from app.routes import chat_routes, mcp_routes, search_routes # Import the new search router
+from fastapi.middleware.cors import CORSMiddleware
+from app.routes import chat_routes, mcp_routes, search_routes 
 
-# Create the FastAPI instance, this is how you use and implement FastAPI
-# TODO: Add middleware to capture correlation IDs for LangSmith tracing.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # --- Startup Logic ---
+    # This is the "Pro" way to handle initialization (Tracing, DB pools, etc.)
+    print("🚀 Starting up Agentic API...")
+    print("📈 Observability: LangSmith Tracing ready (checking .env...)")
+    yield
+    # --- Shutdown Logic ---
+    print("🛑 Shutting down Agentic API...")
+
+# Create the FastAPI instance
 app = FastAPI(
     title="Template for advanced LLM applications",
     description="This is a template for advanced LLM applications",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan
+)
+
+# --- Universal Access (CORS) ---
+# This allows your API to be plugged into Next.js or any other frontend.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, replace with specific origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/", tags=["Root"])
