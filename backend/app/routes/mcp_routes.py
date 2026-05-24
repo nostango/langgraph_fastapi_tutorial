@@ -1,6 +1,10 @@
-# This file implements the MCP endpoint.
-# It acts as a universal adapter, translating standard MCP requests
-# into the format our internal workflows understand.
+# --- Protocol Engineering: Official MCP Server Implementation ---
+# TODO: Transition from this "Bespoke Adapter" to a "Protocol-Compliant Server" using FastMCP.
+# 1. Use `FastMCP("AgenticHub")` to handle JSON-RPC handshakes automatically.
+# 2. Implement the 'Meta-Tool' pattern (list_workflows, invoke_workflow) to scale without 
+#    cluttering the model's context window.
+# 3. Security: Apply the RequestResponder patch to prevent server-wide crashes on client cancellation.
+# 4. macOS Compatibility: Ensure SSE transport is used to avoid asyncio stdio hangs on Python 3.12.
 
 from fastapi import APIRouter, HTTPException
 from langchain_core.messages import HumanMessage

@@ -25,8 +25,8 @@ def chatbot(state: GraphState):
     """
     # TODO: Wrap this invoke in a retry block (e.g., using RunnableRetry) 
     # to handle rate limits or temporary provider outages.
-    # The `state['messages']` contains the entire conversation history.
-    response = llm.invoke(state['messages'])
+    # The `state.messages` contains the entire conversation history.
+    response = llm.invoke(state.messages)
     
     # The `add_messages` helper in our GraphState will automatically
     # append this new response to the list of messages.

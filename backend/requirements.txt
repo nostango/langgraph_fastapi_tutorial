@@ -23,6 +23,7 @@ pydot
 
 # For web framework if you plan to add API endpoints
 fastapi
+fastmcp
 uvicorn
 pydantic
 

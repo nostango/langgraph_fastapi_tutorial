@@ -1,7 +1,9 @@
 from typing import Annotated
 
+from pydantic import BaseModel, Field
+from typing import Annotated, List
+
 from langchain_openai import ChatOpenAI
-from typing_extensions import TypedDict
 from langgraph.graph import StateGraph, START
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -9,12 +11,13 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from app.tools.tavily_tool import search_tool
 
 # This defines the structure of the agent's state.
-# It's a dictionary with a single key, "messages", which is a list of messages.
-# The `add_messages` function ensures that new messages are appended to the list.
-# TODO: Migrate this State from TypedDict to a Pydantic BaseModel for better 
-# performance and validation in production.
-class State(TypedDict):
-    messages: Annotated[list, add_messages]
+# Using Pydantic BaseModel provides runtime validation and 
+# better integration with production standards.
+class State(BaseModel):
+    messages: Annotated[List, add_messages] = Field(
+        default_factory=list,
+        description="The conversation history of the agent."
+    )
 
 # Initialize the graph, telling it what the structure of its state will be.
 graph_builder = StateGraph(State)
@@ -30,7 +33,8 @@ llm_with_tools = llm.bind_tools([search_tool])
 # This function will be called when the "chatbot" node is executed.
 # It invokes the LLM with the current state (messages).
 def chatbot(state: State):
-    return {"messages": [llm_with_tools.invoke(state["messages"])]}
+    return {"messages": [llm_with_tools.invoke(state.messages)]}
+
 
 # Add the chatbot node to the graph.
 graph_builder.add_node("chatbot", chatbot)
