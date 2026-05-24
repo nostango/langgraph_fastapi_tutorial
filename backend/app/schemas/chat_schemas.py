@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import TypedDict, Annotated
+from pydantic import BaseModel, Field
+from typing import Annotated
 from langgraph.graph.message import add_messages
 
 # --- API Data Models (Pydantic) ---
