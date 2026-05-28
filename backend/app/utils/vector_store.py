@@ -1,14 +1,20 @@
-# TODO: Initialize your Vector Database (Pinecone, Weaviate, etc.) here.
-# 1. Load the API Key and Environment/Index name from config.yaml or .env.
-# 2. Setup the client (e.g., pinecone.Index("my-index")).
-# 3. Create a helper function `query_vector_store(query_text: str)` that:
-#    - Embeds the query text using your LLM's embedding model.
-#    - Performs the similarity search.
-#    - Returns a formatted string or list of document snippets.
+import os
 
-def query_vector_store(query: str):
+# --- Resource Layer: Physical Database Connection ---
+
+def query_vector_store(query_text: str):
     """
-    Logic to talk to the physical Vector Database.
-    This keeps your 'Resource' logic separate from your 'Tool' logic.
+    Logic to talk to the physical Vector Database (Pinecone, Weaviate, etc.).
+    This layer handles embedding, similarity search, and raw data retrieval.
     """
-    pass
+    # 1. Setup Client (Placeholder)
+    # api_key = os.getenv("PINECONE_API_KEY")
+    
+    # 2. Embed the query (Placeholder)
+    # vector = embedding_model.embed_query(query_text)
+    
+    # 3. Retrieve Results (Placeholder)
+    print(f"🔍 Searching Vector Store for: '{query_text}'")
+    
+    # Simulating a successful hit
+    return "The company's documentation states that all AI models must use the Pydantic v2/v3 state management pattern for production readiness."

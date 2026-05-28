@@ -46,11 +46,11 @@ def read_root():
 # Include the router for our own frontend
 app.include_router(chat_routes.router, prefix="/chat", tags=["chat"])
 
-# Include the router for external clients
-# TODO: Once migrated to FastMCP, mount the SSE app here using:
-# app.mount("/mcp", mcp.sse_app()) 
-# This replaces the manual router for full protocol compliance.
-app.include_router(mcp_routes.router, prefix="/mcp", tags=["mcp"])
+# --- Protocol Engineering: Official MCP Server (SSE) ---
+# This exposes your agents as standard-compliant tools for external apps
+# like Claude Desktop or Cursor.
+from app.routes.mcp_routes import mcp
+app.mount("/mcp", mcp.sse_app())
 
 # Include the new search router
 app.include_router(search_routes.router, prefix="/search", tags=["search"])

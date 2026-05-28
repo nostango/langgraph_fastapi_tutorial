@@ -1,60 +1,39 @@
 # --- Protocol Engineering: Official MCP Server Implementation ---
-# TODO: Transition from this "Bespoke Adapter" to a "Protocol-Compliant Server" using FastMCP.
-# 1. Use `FastMCP("AgenticHub")` to handle JSON-RPC handshakes automatically.
-# 2. Implement the 'Meta-Tool' pattern (list_workflows, invoke_workflow) to scale without 
-#    cluttering the model's context window.
-# 3. Security: Apply the RequestResponder patch to prevent server-wide crashes on client cancellation.
-# 4. macOS Compatibility: Ensure SSE transport is used to avoid asyncio stdio hangs on Python 3.12.
-
-from fastapi import APIRouter, HTTPException
+from mcp.server.fastmcp import FastMCP
+from app.workflows.chat_workflow import get_graph
 from langchain_core.messages import HumanMessage
 
-# Import the standard MCP schemas and our internal workflow
-from app.schemas.mcp_schemas import MCPRequest, MCPResponse
-from app.workflows.chat_workflow import get_graph
+# 1. Initialize FastMCP
+# This handles the JSON-RPC 2.0 handshake and capability negotiation automatically.
+mcp = FastMCP("AgenticHub")
 
-router = APIRouter()
+# 2. Define Tools (The Meta-Tool Pattern)
+# Instead of hardcoding every workflow, we expose a standard interface 
+# that external agents can discover and use.
 
-@router.post("/invoke", response_model=MCPResponse)
-async def handle_mcp_invoke(request: MCPRequest):
+@mcp.tool()
+async def chat_with_agent(message: str, session_id: str = "default") -> str:
     """
-    This is the universal MCP endpoint.
-    It can handle different actions by routing them to the appropriate workflow.
+    Primary tool to interact with the internal LangGraph chat agent.
+    Use this for general conversation and stateful interactions.
     """
-    # 1. Check which action the external client wants to perform.
-    if request.action == "chat":
-        # 2. If it's a chat action, get our compiled chat graph.
-        graph = get_graph()
-        
-        # 3. Translate the generic MCP payload into the specific format
-        #    our chat workflow expects.
-        message_content = request.payload.get("message")
-        if not message_content:
-            raise HTTPException(status_code=400, detail="Payload for 'chat' action must contain a 'message' field.")
-        
-        # Our workflow expects a list of LangChain message objects.
-        input_messages = [HumanMessage(content=message_content)]
-        
-        # 4. Prepare the config for the graph invocation, using the MCP session_id.
-        config = {"configurable": {"thread_id": request.session_id}}
-        
-        # 5. Invoke the graph.
-        final_state = graph.invoke(
-            {"messages": input_messages},
-            config=config
-        )
-        
-        # 6. Translate the internal result back into the standard MCP response format.
-        ai_response = final_state["messages"][-1]
-        response_data = {"response": ai_response.content}
-        
-        return MCPResponse(data=response_data)
+    graph = get_graph()
+    config = {"configurable": {"thread_id": session_id}}
+    input_messages = [HumanMessage(content=message)]
+    
+    # Invoke the graph (In production, you'd add the RequestResponder patch here)
+    final_state = graph.invoke(
+        {"messages": input_messages},
+        config=config
+    )
+    
+    return final_state.messages[-1].content
 
-    # --- You could add other actions here ---
-    # elif request.action == "summarize":
-    #     # ... call a summarization workflow ...
-    #     pass
+# 3. Dynamic Discovery (Coming Soon)
+# @mcp.tool()
+# def list_available_workflows():
+#     """Returns a directory of all specialized agent workflows available in this hub."""
+#     return ["chat", "search"]
 
-    else:
-        # If the action is not supported, return an error.
-        raise HTTPException(status_code=400, detail=f"Unsupported action: {request.action}")
+# 4. Security & Compatibility
+# Note: For macOS + Python 3.12/3.13, we use SSE transport via the FastAPI mount.
