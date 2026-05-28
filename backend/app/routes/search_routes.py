@@ -13,12 +13,19 @@ async def handle_search_request(request: SearchRequest):
     It invokes the LangGraph agent with the user's message
     and returns the AI's response.
     """
-    config = {"configurable": {"thread_id": request.session_id}}
-    input_message = [HumanMessage(content=request.message)]
-    response = agent_executor.invoke({"messages": input_message}, config=config)
-    ai_response = response["messages"][-1]
+    try:
+        config = {"configurable": {"thread_id": request.session_id}}
+        input_message = [HumanMessage(content=request.message)]
+        response = agent_executor.invoke({"messages": input_message}, config=config)
+        ai_response = response["messages"][-1]
 
-    return SearchResponse(
-        response=ai_response.content,
-        session_id=request.session_id
-    )
+        return SearchResponse(
+            response=ai_response.content,
+            session_id=request.session_id
+        )
+    except Exception as e:
+        print(f"❌ Error in search route: {str(e)}")
+        return SearchResponse(
+            response="I was unable to complete the search. Please check your query or try again later.",
+            session_id=request.session_id
+        )

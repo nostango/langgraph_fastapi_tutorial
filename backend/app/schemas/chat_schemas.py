@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import TypedDict, Annotated
+from pydantic import BaseModel, Field
+from typing import Annotated
 from langgraph.graph.message import add_messages
 
 # --- API Data Models (Pydantic) ---
@@ -14,10 +14,17 @@ class ChatResponse(BaseModel):
     session_id: str
 
 
-# --- Workflow State Model (TypedDict) ---
+# --- Workflow State Model (Pydantic) ---
 
-# TODO: Migrate this from TypedDict to a Pydantic BaseModel (v2/v3).
-# Pydantic states provide 5-10x better performance and built-in validation
-# for every node transition, which is the 2026 standard for production agents.
-class GraphState(TypedDict):
-    messages: Annotated[list, add_messages]
+from typing import List
+
+class GraphState(BaseModel):
+    """
+    Changed from Dictionary to Pydantic so that:
+    1: we are building for FastMCP to be able to read it no problem
+    2: we are validating the entry right when we recieve it instead of validating once the data is already inside/not validating and having it break mid process and have to look for the debug
+    """
+    messages: Annotated[List, add_messages] = Field(
+        default_factory=list,
+        description="The conversation history of the agent."
+    )
